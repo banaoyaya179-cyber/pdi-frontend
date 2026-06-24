@@ -4,6 +4,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import PdiPage from './pages/PdiPage';
+import CartePage from './pages/CartePage';
+import SitesPage from './pages/SitesPage';
 
 function App() {
   return (
@@ -16,6 +18,12 @@ function App() {
           } />
           <Route path="/pdi" element={
             <ProtectedRoute><PdiPage /></ProtectedRoute>
+          } />
+          <Route path="/sites" element={
+            <ProtectedRoute><SitesPage /></ProtectedRoute>
+          } />
+          <Route path="/carte" element={
+            <ProtectedRoute><CartePage /></ProtectedRoute>
           } />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
