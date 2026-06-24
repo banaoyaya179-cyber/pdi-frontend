@@ -8,6 +8,7 @@ import CartePage from './pages/CartePage';
 import SitesPage from './pages/SitesPage';
 import BesoinsPage from './pages/BesoinsPage';
 import DeplacementsPage from './pages/DeplacementsPage';
+import StatistiquesPage from './pages/StatistiquesPage';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/carte" element={<ProtectedRoute><CartePage /></ProtectedRoute>} />
           <Route path="/besoins" element={<ProtectedRoute><BesoinsPage /></ProtectedRoute>} />
           <Route path="/deplacements" element={<ProtectedRoute><DeplacementsPage /></ProtectedRoute>} />
+          <Route path="/statistiques" element={<ProtectedRoute><StatistiquesPage /></ProtectedRoute>} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

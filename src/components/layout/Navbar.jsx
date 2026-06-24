@@ -21,6 +21,7 @@ const Navbar = () => {
     { path: '/deplacements', label: 'Déplacements' },
     { path: '/sites', label: "Sites d'accueil" },
     { path: '/carte', label: 'Carte' },
+    { path: '/statistiques', label: 'Statistiques' },
   ];
 
   return (
