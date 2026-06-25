@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -53,6 +54,7 @@ const Navbar = () => {
             ))}
           </ul>
           <div className="d-flex align-items-center gap-3">
+            <NotificationBell />
             <span className="text-light small">
               <strong>{user?.prenom} {user?.nom}</strong><br />
               <span className="text-warning" style={{ fontSize: '0.75rem' }}>
