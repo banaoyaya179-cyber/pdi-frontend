@@ -10,6 +10,7 @@ import BesoinsPage from './pages/BesoinsPage';
 import DeplacementsPage from './pages/DeplacementsPage';
 import StatistiquesPage from './pages/StatistiquesPage';
 import UtilisateursPage from './pages/UtilisateursPage';
+import AuditLogPage from './pages/AuditLogPage';
 
 function App() {
   return (
@@ -26,6 +27,9 @@ function App() {
           <Route path="/statistiques" element={<ProtectedRoute><StatistiquesPage /></ProtectedRoute>} />
           <Route path="/utilisateurs" element={
             <ProtectedRoute roles={['ROLE_ADMIN']}><UtilisateursPage /></ProtectedRoute>
+          } />
+          <Route path="/audit" element={
+            <ProtectedRoute roles={['ROLE_ADMIN']}><AuditLogPage /></ProtectedRoute>
           } />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

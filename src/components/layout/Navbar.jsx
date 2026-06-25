@@ -19,13 +19,14 @@ const Navbar = () => {
     { path: '/pdi', label: 'Gestion PDI' },
     { path: '/besoins', label: 'Besoins & Aides' },
     { path: '/deplacements', label: 'Déplacements' },
-    { path: "/sites", label: "Sites d'accueil" },
+    { path: '/sites', label: "Sites d'accueil" },
     { path: '/carte', label: 'Carte' },
     { path: '/statistiques', label: 'Statistiques' },
   ];
 
   const liensAdmin = [
     { path: '/utilisateurs', label: '⚙️ Utilisateurs' },
+    { path: '/audit', label: '🔒 Audit' },
   ];
 
   const liens = user?.role === 'ROLE_ADMIN'
