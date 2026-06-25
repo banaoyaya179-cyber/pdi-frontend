@@ -14,15 +14,23 @@ const Navbar = () => {
     ROLE_RESPONSABLE: 'Responsable humanitaire',
   };
 
-  const liens = [
+  const liensCommuns = [
     { path: '/dashboard', label: 'Tableau de bord' },
     { path: '/pdi', label: 'Gestion PDI' },
     { path: '/besoins', label: 'Besoins & Aides' },
     { path: '/deplacements', label: 'Déplacements' },
-    { path: '/sites', label: "Sites d'accueil" },
+    { path: "/sites", label: "Sites d'accueil" },
     { path: '/carte', label: 'Carte' },
     { path: '/statistiques', label: 'Statistiques' },
   ];
+
+  const liensAdmin = [
+    { path: '/utilisateurs', label: '⚙️ Utilisateurs' },
+  ];
+
+  const liens = user?.role === 'ROLE_ADMIN'
+    ? [...liensCommuns, ...liensAdmin]
+    : liensCommuns;
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#1a3a5c' }}>
