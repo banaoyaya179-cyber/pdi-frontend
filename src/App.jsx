@@ -11,6 +11,7 @@ import DeplacementsPage from './pages/DeplacementsPage';
 import StatistiquesPage from './pages/StatistiquesPage';
 import UtilisateursPage from './pages/UtilisateursPage';
 import AuditLogPage from './pages/AuditLogPage';
+import Setup2FAPage from './pages/Setup2FAPage';
 
 function App() {
   return (
@@ -30,6 +31,9 @@ function App() {
           } />
           <Route path="/audit" element={
             <ProtectedRoute roles={['ROLE_ADMIN']}><AuditLogPage /></ProtectedRoute>
+          } />
+          <Route path="/securite" element={
+            <ProtectedRoute><Setup2FAPage /></ProtectedRoute>
           } />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

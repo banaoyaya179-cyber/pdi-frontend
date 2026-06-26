@@ -55,6 +55,9 @@ const Navbar = () => {
           </ul>
           <div className="d-flex align-items-center gap-3">
             <NotificationBell />
+            <Link to="/securite" className="btn btn-outline-warning btn-sm fw-semibold">
+              🔐 2FA
+            </Link>
             <span className="text-light small">
               <strong>{user?.prenom} {user?.nom}</strong><br />
               <span className="text-warning" style={{ fontSize: '0.75rem' }}>

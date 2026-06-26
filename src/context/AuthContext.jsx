@@ -20,13 +20,20 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, motDePasse) => {
     const response = await loginApi(email, motDePasse);
-    const { token, email: userEmail, role, nom, prenom } = response.data;
+    const data = response.data;
+
+    // Si 2FA requis — retourner sans stocker le token
+    if (data.requires2FA) {
+      return { requires2FA: true, email: data.email };
+    }
+
+    const { token, email: userEmail, role, nom, prenom } = data;
     const userData = { email: userEmail, role, nom, prenom };
     localStorage.setItem('pdi_token', token);
     localStorage.setItem('pdi_user', JSON.stringify(userData));
     setToken(token);
     setUser(userData);
-    return userData;
+    return { requires2FA: false };
   };
 
   const logout = () => {
