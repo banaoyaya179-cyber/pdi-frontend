@@ -58,7 +58,7 @@ const PdiPage = () => {
     setPage(0);
   };
 
-  const handleEnrolementSuccess = () => {
+  const handleEnrolementSuccess = (mode) => {
     setShowForm(false);
     charger();
   };
