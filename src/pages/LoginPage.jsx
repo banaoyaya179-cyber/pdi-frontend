@@ -137,7 +137,7 @@ const LoginPage = () => {
           )}
 
           <p className="text-center text-muted mt-4 small">
-            SP/CONASUR — Ministère de l'Action Humanitaire
+            UNZ-Koudougou — Projet Académique L3 Informatique
           </p>
         </div>
       </div>

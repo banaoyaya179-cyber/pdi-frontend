@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getFicheEnAttente, supprimerFiche } from '../../utils/offlineStorage';
 import { enrolerPdi } from '../../api/pdiApi';
+import { creerMenage } from '../../api/menageApi';
 
 const SyncBanner = () => {
   const [enLigne, setEnLigne] = useState(navigator.onLine);
@@ -15,13 +16,8 @@ const SyncBanner = () => {
 
   useEffect(() => {
     chargerFiches();
-
-    const handleOnline = () => {
-      setEnLigne(true);
-      chargerFiches();
-    };
+    const handleOnline = () => { setEnLigne(true); chargerFiches(); };
     const handleOffline = () => setEnLigne(false);
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     return () => {
@@ -36,24 +32,47 @@ const SyncBanner = () => {
     let succes = 0;
     let echecs = 0;
 
+    // Cache des ménages temporaires déjà créés (idTemp -> idReel)
+    // pour ne pas créer plusieurs fois le même ménage si plusieurs PDI
+    // partagent le même ID temporaire négatif
+    const menagesCreés = {};
+
     for (const fiche of fichesEnAttente) {
       try {
         const { id, dateSauvegarde, ...donnees } = fiche;
+
+        // CORRECTION : si l'ID du ménage est négatif (temporaire offline),
+        // on crée d'abord le vrai ménage en base avant d'enrôler la PDI
+        if (donnees.idMenage < 0) {
+          const idTemp = donnees.idMenage;
+
+          if (!menagesCreés[idTemp]) {
+            // Créer le ménage réel côté serveur
+            const resMenage = await creerMenage({ idSite: donnees.idSiteCourant });
+            menagesCreés[idTemp] = resMenage.data.id;
+          }
+
+          // Remplacer l'ID temporaire par l'ID réel
+          donnees.idMenage = menagesCreés[idTemp];
+        }
+
         await enrolerPdi(donnees);
         await supprimerFiche(id);
         succes++;
-      } catch {
+      } catch (err) {
+        console.error('Échec synchronisation fiche :', err?.response?.data || err.message);
         echecs++;
       }
     }
 
     await chargerFiches();
     setSyncing(false);
-    setMessage(`Synchronisation : ${succes} fiche(s) envoyée(s)${echecs > 0 ? `, ${echecs} échec(s)` : ''}.`);
+    setMessage(
+      `Synchronisation : ${succes} fiche(s) envoyée(s)${echecs > 0 ? `, ${echecs} échec(s)` : ''}.`
+    );
     setTimeout(() => setMessage(''), 5000);
   };
 
-  // Pas en ligne et pas de fiches en attente = rien à afficher
   if (enLigne && fichesEnAttente.length === 0) return null;
 
   return (

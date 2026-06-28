@@ -40,10 +40,10 @@ const AdminDashboard = () => {
 
   return (
     <MainLayout>
-      <div className="p-4 mb-4 rounded-3 text-white"
+      <div className="p-5 mb-4 rounded-3 text-white text-center"
         style={{ background: 'linear-gradient(135deg, #1a3a5c, #dc3545)' }}>
-        <h4 className="fw-bold mb-1">Bonjour, {user?.prenom} 👋</h4>
-        <p className="mb-0 opacity-75">Administrateur système — Accès complet</p>
+        <p className="fw-bold fst-italic mb-2" style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>"Derrière chaque dossier se cache une histoire. Derrière chaque intervention renaît un espoir. Merci de faire de votre engagement une source de dignité et d'avenir pour les personnes déplacées internes."</p>
+        <p className="mb-0 fw-semibold" style={{ fontSize: '0.9rem', opacity: 0.85 }}>Administrateur</p>
       </div>
 
       {loading ? (

@@ -3,7 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaf
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import MainLayout from '../components/layout/MainLayout';
-import { getAllSites } from '../api/siteApi';
+import { getAllSites, getSiteById } from '../api/siteApi';
+import { useAuth } from '../context/AuthContext';
 
 // Fix icône Leaflet avec Vite
 delete L.Icon.Default.prototype._getIconUrl;
@@ -22,14 +23,23 @@ const couleurParStatut = {
 const CartePage = () => {
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const isAgent = user?.role === 'ROLE_AGENT';
   const [siteSelectionne, setSiteSelectionne] = useState(null);
 
   useEffect(() => {
-    getAllSites()
-      .then(r => setSites(r.data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+    if (isAgent && user?.idSiteAffecte) {
+      getSiteById(user.idSiteAffecte)
+        .then(r => setSites([r.data]))
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    } else {
+      getAllSites()
+        .then(r => setSites(r.data))
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }
+  }, [isAgent, user]);
 
   // Centre sur le Burkina Faso
   const centre = [12.3714277, -1.5196603];
@@ -52,12 +62,12 @@ const CartePage = () => {
         <div className="col-md-8">
           <div className="card shadow-sm" style={{ borderRadius: '12px', overflow: 'hidden' }}>
             {loading ? (
-              <div className="d-flex justify-content-center align-items-center" style={{ height: '500px' }}>
+              <div className="d-flex justify-content-center align-items-center" style={{ height: "calc(100vh - 200px)" }}>
                 <div className="spinner-border text-primary" />
               </div>
             ) : (
-              <MapContainer center={centre} zoom={7}
-                style={{ height: '500px', width: '100%' }}>
+              <MapContainer center={isAgent && sites.length === 1 ? [sites[0].latitude, sites[0].longitude] : centre} zoom={isAgent && sites.length === 1 ? 12 : 7}
+                style={{ height: "calc(100vh - 200px)", width: "100%" }}>
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

@@ -26,6 +26,14 @@ const EnrolementForm = ({ sites, onSuccess, onCancel }) => {
     finally { setLoading(false); }
   };
 
+  // CORRECTION : en offline on génère un ID temporaire négatif unique
+  const handleCreerMenageOffline = () => {
+    if (!form.idSiteCourant) { setErreur("Veuillez sélectionner un site."); return; }
+    const idTemp = -Date.now(); // ID négatif temporaire, jamais en conflit avec la BDD
+    setIdMenage(idTemp);
+    setEtape(2);
+  };
+
   const handleMenageExistant = () => {
     const id = prompt('Entrez le numéro du ménage existant :');
     if (id && !isNaN(id)) { setIdMenage(parseInt(id)); setEtape(2); }
@@ -109,11 +117,20 @@ const EnrolementForm = ({ sites, onSuccess, onCancel }) => {
                   </select>
                 </div>
                 <div className="d-flex gap-3 mt-4">
-                  <button className="btn flex-fill text-white fw-semibold"
-                    style={{ backgroundColor: '#1a3a5c' }}
-                    onClick={handleCreerMenage} disabled={loading || !navigator.onLine}>
-                    {loading ? '...' : '+ Créer un nouveau ménage'}
-                  </button>
+                  {navigator.onLine ? (
+                    <button className="btn flex-fill text-white fw-semibold"
+                      style={{ backgroundColor: '#1a3a5c' }}
+                      onClick={handleCreerMenage} disabled={loading}>
+                      {loading ? '...' : '+ Créer un nouveau ménage'}
+                    </button>
+                  ) : (
+                    // CORRECTION : bouton offline crée un ménage temporaire local
+                    <button className="btn flex-fill text-white fw-semibold"
+                      style={{ backgroundColor: '#dc3545' }}
+                      onClick={handleCreerMenageOffline} disabled={loading}>
+                      💾 Créer ménage temporaire (hors ligne)
+                    </button>
+                  )}
                   <button className="btn btn-outline-secondary flex-fill"
                     onClick={handleMenageExistant}>
                     Ménage existant (par ID)
@@ -121,7 +138,8 @@ const EnrolementForm = ({ sites, onSuccess, onCancel }) => {
                 </div>
                 {!navigator.onLine && (
                   <p className="text-muted small mt-2">
-                    * En mode hors ligne, utilisez un ménage existant (par ID).
+                    ℹ️ En mode hors ligne, un ID temporaire sera assigné au ménage.
+                    Lors de la synchronisation, un vrai ménage sera créé automatiquement.
                   </p>
                 )}
               </div>
@@ -130,7 +148,9 @@ const EnrolementForm = ({ sites, onSuccess, onCancel }) => {
             {etape === 2 && (
               <form onSubmit={handleSubmit}>
                 <div className="alert alert-info small mb-4">
-                  Ménage #{idMenage} sélectionné
+                  {idMenage < 0
+                    ? '📋 Ménage temporaire (sera créé lors de la synchronisation)'
+                    : `Ménage #${idMenage} sélectionné`}
                 </div>
                 <div className="row g-3">
                   <div className="col-md-6">

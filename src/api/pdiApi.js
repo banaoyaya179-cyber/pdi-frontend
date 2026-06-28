@@ -11,3 +11,6 @@ export const rechercherPdi = (params) =>
 
 export const mettreAJourPdi = (id, data) =>
   api.put(`/agent/pdi/${id}`, data);
+
+export const supprimerPdi = (id) =>
+  api.delete(`/agent/pdi/${id}`);

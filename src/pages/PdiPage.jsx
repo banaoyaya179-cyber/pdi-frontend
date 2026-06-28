@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { rechercherPdi } from '../api/pdiApi';
-import { getAllSites } from '../api/siteApi';
+import { getAllSites, getSiteById } from '../api/siteApi';
 import EnrolementForm from '../components/pdi/EnrolementForm';
+
+const SITES_CACHE_KEY = 'pdi_burkina_sites_cache';
 
 const statutColors = {
   DEPLACE_INITIAL: '#0d6efd',
@@ -19,6 +23,10 @@ const statutLabels = {
 };
 
 const PdiPage = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAgent = user?.role === 'ROLE_AGENT';
+  const peutEnroler = user?.role === 'ROLE_AGENT' || user?.role === 'ROLE_ADMIN';
   const [pdis, setPdis] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -32,6 +40,7 @@ const PdiPage = () => {
     setLoading(true);
     try {
       const params = { page, taille: 10 };
+      if (isAgent && user?.idSiteAffecte) params.idSite = user.idSiteAffecte;
       if (filtres.nom) params.nom = filtres.nom;
       if (filtres.prenom) params.prenom = filtres.prenom;
       if (filtres.statut) params.statut = filtres.statut;
@@ -49,8 +58,38 @@ const PdiPage = () => {
 
   useEffect(() => { charger(); }, [charger]);
 
+  // CORRECTION : charger les sites avec cache localStorage
   useEffect(() => {
-    getAllSites().then(r => setSites(r.data)).catch(console.error);
+    const chargerSites = async () => {
+      if (navigator.onLine) {
+        try {
+          const res = isAgent && user?.idSiteAffecte
+            ? await getSiteById(user.idSiteAffecte)
+            : await getAllSites();
+          const sitesData = isAgent && user?.idSiteAffecte ? [res.data] : res.data;
+          setSites(sitesData);
+          localStorage.setItem(SITES_CACHE_KEY, JSON.stringify(sitesData));
+        } catch (err) {
+          console.error('Erreur chargement sites:', err);
+          // Fallback sur le cache si l'API échoue
+          const cache = localStorage.getItem(SITES_CACHE_KEY);
+          if (cache) setSites(JSON.parse(cache));
+        }
+      } else {
+        // Mode offline : lire depuis le cache
+        const cache = localStorage.getItem(SITES_CACHE_KEY);
+        if (cache) {
+          setSites(JSON.parse(cache));
+        }
+      }
+    };
+
+    chargerSites();
+
+    // Recharger les sites quand le réseau est rétabli
+    const handleOnline = () => chargerSites();
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
   }, []);
 
   const handleFiltreChange = (e) => {
@@ -60,7 +99,7 @@ const PdiPage = () => {
 
   const handleEnrolementSuccess = (mode) => {
     setShowForm(false);
-    charger();
+    if (mode === 'online') charger();
   };
 
   return (
@@ -73,7 +112,7 @@ const PdiPage = () => {
           </span>
         </h5>
         <button className="btn text-white fw-semibold"
-          style={{ backgroundColor: '#1a3a5c', borderRadius: '8px' }}
+          style={{ backgroundColor: '#1a3a5c', borderRadius: '8px', display: peutEnroler ? 'inline-block' : 'none' }}
           onClick={() => setShowForm(true)}>
           + Enrôler une PDI
         </button>
@@ -133,7 +172,7 @@ const PdiPage = () => {
                     </td>
                   </tr>
                 ) : pdis.map(p => (
-                  <tr key={p.id}>
+                  <tr key={p.id} style={{ cursor: 'pointer' }} onClick={() => { console.log("Click PDI id:", p.id); navigate(`/pdi/${p.id}`); }}>
                     <td><span className="text-muted small">#{p.id}</span></td>
                     <td className="fw-semibold">{p.nom} {p.prenom}</td>
                     <td>{p.sexe === 'F' ? '♀ F' : '♂ M'}</td>

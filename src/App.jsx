@@ -12,6 +12,8 @@ import StatistiquesPage from './pages/StatistiquesPage';
 import UtilisateursPage from './pages/UtilisateursPage';
 import AuditLogPage from './pages/AuditLogPage';
 import Setup2FAPage from './pages/Setup2FAPage';
+import PdiDetailPage from './pages/PdiDetailPage';
+import SiteDetailPage from './pages/SiteDetailPage';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
           <Route path="/audit" element={
             <ProtectedRoute roles={['ROLE_ADMIN']}><AuditLogPage /></ProtectedRoute>
           } />
+          <Route path="/sites/:id" element={<ProtectedRoute><SiteDetailPage /></ProtectedRoute>} />
+          <Route path="/pdi/:id" element={<ProtectedRoute><PdiDetailPage /></ProtectedRoute>} />
           <Route path="/securite" element={
             <ProtectedRoute><Setup2FAPage /></ProtectedRoute>
           } />

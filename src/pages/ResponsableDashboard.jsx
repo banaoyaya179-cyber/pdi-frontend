@@ -26,6 +26,7 @@ const ResponsableDashboard = () => {
 
   const total = pdis.length;
   const femmes = pdis.filter(p => p.sexe === 'F').length;
+  const hommes = pdis.filter(p => p.sexe === 'M').length;
   const mineurs = pdis.filter(p => p.age < 18).length;
   const retournes = pdis.filter(p => p.statutCourant === 'RETOURNE' || p.statutCourant === 'REINSTALLE').length;
   const sitesSatures = sites.filter(s => s.statut === 'SATURE');
@@ -33,6 +34,7 @@ const ResponsableDashboard = () => {
 
   const indicateurs = [
     { label: 'Total PDI/Retournés', valeur: total, couleur: '#1a3a5c', icone: '👥', sub: 'personnes enregistrées' },
+    { label: 'Hommes', valeur: hommes, couleur: '#0d6efd', icone: '♂', sub: `${total > 0 ? Math.round(hommes/total*100) : 0}% du total` },
     { label: 'Femmes', valeur: femmes, couleur: '#e83e8c', icone: '♀', sub: `${total > 0 ? Math.round(femmes/total*100) : 0}% du total` },
     { label: 'Mineurs (-18 ans)', valeur: mineurs, couleur: '#fd7e14', icone: '👶', sub: `${total > 0 ? Math.round(mineurs/total*100) : 0}% du total` },
     { label: 'Retournés/Réinstallés', valeur: retournes, couleur: '#28a745', icone: '🏠', sub: 'processus de retour' },
@@ -50,10 +52,10 @@ const ResponsableDashboard = () => {
   return (
     <MainLayout>
       {/* Accueil personnalisé */}
-      <div className="p-4 mb-4 rounded-3 text-white"
+      <div className="p-5 mb-4 rounded-3 text-white text-center"
         style={{ background: 'linear-gradient(135deg, #6f42c1, #0d6efd)' }}>
-        <h4 className="fw-bold mb-1">Bonjour, {user?.prenom} 👋</h4>
-        <p className="mb-0 opacity-75">Responsable humanitaire — Accès analyse & pilotage</p>
+        <p className="fw-bold fst-italic mb-2" style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>"Derrière chaque dossier se cache une histoire. Derrière chaque intervention renaît un espoir. Merci de faire de votre engagement une source de dignité et d'avenir pour les personnes déplacées internes."</p>
+        <p className="mb-0 fw-semibold" style={{ fontSize: '0.9rem', opacity: 0.85 }}>Responsable humanitaire</p>
       </div>
 
       {loading ? (
@@ -80,11 +82,11 @@ const ResponsableDashboard = () => {
           <h6 className="fw-semibold mb-3" style={{ color: '#1a3a5c' }}>Indicateurs humanitaires clés</h6>
           <div className="row g-3 mb-4">
             {indicateurs.map(ind => (
-              <div key={ind.label} className="col-md-4 col-lg-2">
+              <div key={ind.label} className="col">
                 <div className="card shadow-sm text-center p-3 h-100"
                   style={{ borderRadius: '12px', borderTop: `4px solid ${ind.couleur}` }}>
-                  <div style={{ fontSize: '1.8rem' }}>{ind.icone}</div>
-                  <h4 className="fw-bold mb-0 mt-1" style={{ color: ind.couleur }}>{ind.valeur}</h4>
+                  <div style={{ fontSize: "1.3rem" }}>{ind.icone}</div>
+                  <h5 className="fw-bold mb-0 mt-1" style={{ color: ind.couleur }}>{ind.valeur}</h5>
                   <p className="fw-semibold small mb-0">{ind.label}</p>
                   <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>{ind.sub}</p>
                 </div>

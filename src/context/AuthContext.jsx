@@ -27,8 +27,8 @@ export const AuthProvider = ({ children }) => {
       return { requires2FA: true, email: data.email };
     }
 
-    const { token, email: userEmail, role, nom, prenom } = data;
-    const userData = { email: userEmail, role, nom, prenom };
+    const { token, email: userEmail, role, nom, prenom, idSiteAffecte } = data;
+    const userData = { email: userEmail, role, nom, prenom, idSiteAffecte };
     localStorage.setItem('pdi_token', token);
     localStorage.setItem('pdi_user', JSON.stringify(userData));
     setToken(token);

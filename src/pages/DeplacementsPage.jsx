@@ -2,9 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import { rechercherPdi } from '../api/pdiApi';
 import { getAllSites } from '../api/siteApi';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axiosConfig';
 
 const DeplacementsPage = () => {
+  const { user } = useAuth();
+  const isAgent = user?.role === 'ROLE_AGENT';
+  const peutModifier = user?.role === 'ROLE_AGENT' || user?.role === 'ROLE_ADMIN';
+
   const [pdis, setPdis] = useState([]);
   const [sites, setSites] = useState([]);
   const [pdiSelectionnee, setPdiSelectionnee] = useState(null);
@@ -17,7 +22,7 @@ const DeplacementsPage = () => {
   const [succes, setSucces] = useState('');
 
   useEffect(() => {
-    rechercherPdi({ taille: 100 }).then(r => setPdis(r.data.contenu)).catch(console.error);
+    rechercherPdi({ taille: 2000, ...(isAgent && user?.idSiteAffecte ? { idSite: user.idSiteAffecte } : {}) }).then(r => setPdis(r.data.contenu)).catch(console.error);
     getAllSites().then(r => setSites(r.data)).catch(console.error);
   }, []);
 
@@ -69,7 +74,6 @@ const DeplacementsPage = () => {
       </h5>
 
       <div className="row g-4">
-        {/* Liste PDI */}
         <div className="col-md-4">
           <div className="card shadow-sm" style={{ borderRadius: '12px' }}>
             <div className="card-header fw-semibold"
@@ -82,8 +86,7 @@ const DeplacementsPage = () => {
                 onChange={e => setRecherche(e.target.value)} />
               <div style={{ maxHeight: '450px', overflowY: 'auto' }}>
                 {pdisFiltrees.map(p => (
-                  <div key={p.id}
-                    className="p-2 mb-1 rounded small"
+                  <div key={p.id} className="p-2 mb-1 rounded small"
                     style={{
                       cursor: 'pointer',
                       backgroundColor: pdiSelectionnee?.id === p.id ? '#1a3a5c' : '#f8f9fa',
@@ -99,7 +102,6 @@ const DeplacementsPage = () => {
           </div>
         </div>
 
-        {/* Historique */}
         <div className="col-md-8">
           {!pdiSelectionnee ? (
             <div className="card shadow-sm text-center py-5" style={{ borderRadius: '12px' }}>
@@ -109,25 +111,24 @@ const DeplacementsPage = () => {
             <>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                  <h6 className="fw-bold mb-0">
-                    {pdiSelectionnee.nom} {pdiSelectionnee.prenom}
-                  </h6>
+                  <h6 className="fw-bold mb-0">{pdiSelectionnee.nom} {pdiSelectionnee.prenom}</h6>
                   <small className="text-muted">
                     Site actuel : <strong>{pdiSelectionnee.nomSiteCourant}</strong>
                   </small>
                 </div>
-                <button className="btn btn-sm text-white fw-semibold"
-                  style={{ backgroundColor: '#1a3a5c', borderRadius: '8px' }}
-                  onClick={() => { setShowForm(true); setSucces(''); setErreur(''); }}>
-                  Enregistrer un déplacement
-                </button>
+                {peutModifier && (
+                  <button className="btn btn-sm text-white fw-semibold"
+                    style={{ backgroundColor: '#1a3a5c', borderRadius: '8px' }}
+                    onClick={() => { setShowForm(true); setSucces(''); setErreur(''); }}>
+                    Enregistrer un déplacement
+                  </button>
+                )}
               </div>
 
               {succes && <div className="alert alert-success small">{succes}</div>}
               {erreur && <div className="alert alert-danger small">{erreur}</div>}
 
-              {/* Formulaire déplacement */}
-              {showForm && (
+              {showForm && peutModifier && (
                 <div className="card shadow-sm mb-3" style={{ borderRadius: '12px', border: '2px solid #1a3a5c' }}>
                   <div className="card-body">
                     <h6 className="fw-semibold mb-3">Nouveau déplacement</h6>
@@ -173,7 +174,6 @@ const DeplacementsPage = () => {
                 </div>
               )}
 
-              {/* Timeline historique */}
               {loading ? (
                 <div className="text-center py-4"><div className="spinner-border text-primary" /></div>
               ) : historique.length === 0 ? (
@@ -182,8 +182,7 @@ const DeplacementsPage = () => {
                 </div>
               ) : (
                 <div className="card shadow-sm" style={{ borderRadius: '12px' }}>
-                  <div className="card-header fw-semibold"
-                    style={{ backgroundColor: '#f8f9fa' }}>
+                  <div className="card-header fw-semibold" style={{ backgroundColor: '#f8f9fa' }}>
                     Historique ({historique.length} déplacement(s))
                   </div>
                   <div className="card-body p-0">

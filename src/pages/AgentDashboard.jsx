@@ -28,7 +28,7 @@ const AgentDashboard = () => {
   }, []);
 
   const actions = [
-    { label: 'Enrôler une PDI', path: '/pdi', couleur: '#1a3a5c', icone: '➕', desc: 'Enregistrer une nouvelle personne déplacée' },
+    { label: 'Enrôler une PDI', path: '/pdi', couleur: '#0d6efd', icone: '➕', desc: 'Enregistrer une nouvelle personne déplacée' },
     { label: 'Déclarer un besoin', path: '/besoins', couleur: '#fd7e14', icone: '📋', desc: 'Saisir un besoin pour une PDI ou un ménage' },
     { label: 'Enregistrer un déplacement', path: '/deplacements', couleur: '#6f42c1', icone: '🔄', desc: 'Tracer le mouvement d\'une PDI' },
     { label: 'Consulter les sites', path: '/sites', couleur: '#28a745', icone: '🏕️', desc: 'Vérifier la capacité des sites d\'accueil' },
@@ -37,12 +37,11 @@ const AgentDashboard = () => {
   return (
     <MainLayout>
       {/* Accueil personnalisé */}
-      <div className="p-4 mb-4 rounded-3 text-white"
+      <div className="p-5 mb-4 rounded-3 text-white text-center"
         style={{ background: 'linear-gradient(135deg, #1a3a5c, #0d6efd)' }}>
-        <h4 className="fw-bold mb-1">Bonjour, {user?.prenom} 👋</h4>
-        <p className="mb-0 opacity-75">Agent de terrain — Accès opérationnel</p>
+        <p className="fw-bold fst-italic mb-2" style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>"Derrière chaque dossier se cache une histoire. Derrière chaque intervention renaît un espoir. Merci de faire de votre engagement une source de dignité et d'avenir pour les personnes déplacées internes."</p>
+        <p className="mb-0 fw-semibold" style={{ fontSize: '0.9rem', opacity: 0.85 }}>Agent de terrain</p>
       </div>
-
       {loading ? (
         <div className="text-center py-5"><div className="spinner-border text-primary" /></div>
       ) : (
@@ -83,9 +82,9 @@ const AgentDashboard = () => {
                       <div key={a.path} className="col-6">
                         <Link to={a.path} className="text-decoration-none">
                           <div className="card h-100 text-center p-3"
-                            style={{ borderRadius: '10px', border: `2px solid ${a.couleur}`, cursor: 'pointer', transition: 'all 0.2s' }}
+                            style={{ borderRadius: '10px', border: `2px solid ${a.couleur}`, cursor: 'pointer', transition: 'all 0.2s', backgroundColor: '#f8f9fa' }}
                             onMouseEnter={e => e.currentTarget.style.backgroundColor = a.couleur + '15'}
-                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'white'}>
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f8f9fa'}>
                             <div style={{ fontSize: '2rem' }}>{a.icone}</div>
                             <div className="fw-semibold small mt-1" style={{ color: a.couleur }}>{a.label}</div>
                             <div className="text-muted" style={{ fontSize: '0.7rem' }}>{a.desc}</div>

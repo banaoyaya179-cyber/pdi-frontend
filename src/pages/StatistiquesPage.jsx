@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import { rechercherPdi } from '../api/pdiApi';
-import { getAllSites } from '../api/siteApi';
+import { getAllSites, getSiteById } from '../api/siteApi';
 import { exporterRapportPDF } from '../utils/exportPdf';
+import { useAuth } from '../context/AuthContext';
 
 const STATUT_LABELS = {
   DEPLACE_INITIAL: 'Déplacé initial',
@@ -43,24 +44,30 @@ const BarChart = ({ data, title, colorFn }) => {
 };
 
 const StatistiquesPage = () => {
+  const { user } = useAuth();
+  const isAgent = user?.role === 'ROLE_AGENT';
   const [pdis, setPdis] = useState([]);
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dateExport] = useState(new Date().toLocaleDateString('fr-FR', {
     day: '2-digit', month: 'long', year: 'numeric'
   }));
-
   useEffect(() => {
+    const pdiParams = isAgent && user?.idSiteAffecte
+      ? { taille: 1000, idSite: user.idSiteAffecte }
+      : { taille: 1000 };
+    const sitesPromise = isAgent && user?.idSiteAffecte
+      ? getSiteById(user.idSiteAffecte).then(r => [r.data])
+      : getAllSites().then(r => r.data);
     Promise.all([
-      rechercherPdi({ taille: 1000 }),
-      getAllSites(),
-    ]).then(([pdiRes, sitesRes]) => {
+      rechercherPdi(pdiParams),
+      sitesPromise,
+    ]).then(([pdiRes, sitesData]) => {
       setPdis(pdiRes.data.contenu);
-      setSites(sitesRes.data);
+      setSites(sitesData);
     }).catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
-
+  }, [isAgent, user]);
   const total = pdis.length;
   const femmes = pdis.filter(p => p.sexe === 'F').length;
   const hommes = pdis.filter(p => p.sexe === 'M').length;
@@ -143,7 +150,7 @@ const StatistiquesPage = () => {
             <div>
               <h4 className="fw-bold mb-1">🇧🇫 PDI-Burkina</h4>
               <h6 className="mb-0 opacity-75">Rapport de situation humanitaire</h6>
-              <small className="opacity-75">SP/CONASUR — Ministère de l'Action Humanitaire</small>
+              <small className="opacity-75">UNZ-Koudougou — Projet Académique L3 Informatique</small>
             </div>
             <div className="text-end">
               <div className="fw-semibold">Date d'édition</div>
@@ -253,7 +260,7 @@ const StatistiquesPage = () => {
         {/* Pied de page rapport */}
         <div className="text-center text-muted small mt-4 py-3"
           style={{ borderTop: '1px solid #dee2e6' }}>
-          Document généré automatiquement par PDI-Burkina — SP/CONASUR — {dateExport}
+          Document généré automatiquement par PDI-Burkina — UNZ-Koudougou — {dateExport}
         </div>
       </div>
     </MainLayout>
